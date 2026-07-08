@@ -24,7 +24,7 @@ script_dir <- if (length(script_path) && nzchar(script_path)) {
 
 qmd_file  <- file.path(script_dir, "data_quality_report.qmd")
 html_src  <- file.path(script_dir, "data_quality_report.html")
-html_dest <- file.path(script_dir, "..", "data", "data_quality_report.html")
+html_dest <- file.path(script_dir, "..", "output", "data_quality_report.html")
 
 quarto::quarto_render(input = qmd_file)
 
