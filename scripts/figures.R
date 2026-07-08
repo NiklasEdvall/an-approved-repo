@@ -81,8 +81,8 @@ make_panel <- function(ear_label) {
     # PTT: mean ± SEM pointrange + connecting line
     stat_summary(
       fun     = mean,
-      fun.min = function(x) mean(x, na.rm = TRUE) - std_error(x),
-      fun.max = function(x) mean(x, na.rm = TRUE) + std_error(x),
+      fun.min = function(x) mean(x, na.rm = TRUE) - sd(x),
+      fun.max = function(x) mean(x, na.rm = TRUE) + sd(x),
       geom    = "pointrange", size = pointsz, alpha = pointa,
       position = position_dodge(width = pointscat)
     ) +
@@ -92,8 +92,8 @@ make_panel <- function(ear_label) {
     stat_summary(
       data    = ucl_long[ucl_long$ear == ear_label, ],
       fun     = mean,
-      fun.min = function(x) mean(x, na.rm = TRUE) - std_error(x),
-      fun.max = function(x) mean(x, na.rm = TRUE) + std_error(x),
+      fun.min = function(x) mean(x, na.rm = TRUE) - sd(x),
+      fun.max = function(x) mean(x, na.rm = TRUE) + sd(x),
       geom    = "pointrange", size = pointsz, alpha = pointa,
       position = position_dodge(width = pointscat)
     ) +
