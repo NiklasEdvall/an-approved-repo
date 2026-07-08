@@ -1,0 +1,119 @@
+---
+title: "Audiological Data — Quality Report"
+date: today
+format:
+  html:
+    page-layout: full
+    max-width: 1600px
+    self-contained: true
+    output-file: data_quality_report.html
+execute:
+  echo: false
+  warning: false
+  message: false
+
+---
+
+```{r setup}
+library(arsenal)
+library(knitr)
+library(kableExtra)
+
+# ---------------------------------------------------------------------------
+# Load data
+# The Age column is read as character because it contains a mix of integer
+# ages and 4-digit birth years (data entry errors).
+# ---------------------------------------------------------------------------
+data_path <- file.path("..", "data", "aud_data_simulated.csv")
+if (!file.exists(data_path)) {
+  data_path <- file.path("data", "aud_data_simulated.csv")
+}
+
+d <- read.csv(data_path, colClasses = c(Age = "character"))
+
+# Treat Group and Sex as factors with informative labels
+d$Group <- factor(d$Group, levels = 1:3,
+                  labels = c("No tinnitus", "Mild tinnitus", "Severe tinnitus"))
+d$Sex   <- factor(d$Sex, levels = 1:3,
+                  labels = c("Male", "Female", "Other"))
+
+# Hearing threshold column names (left and right ears)
+l_cols <- paste0("L", c(125, 250, 500, 1000, 2000, 3000, 4000, 6000, 8000))
+r_cols <- paste0("R", c(125, 250, 500, 1000, 2000, 3000, 4000, 6000, 8000))
+```
+
+
+## Descriptive table by tinnitus group
+
+Data stratified by tinnitus severity group in table to highlight any data quality issues.
+
+```{r arsenal-table, results = "asis"}
+# ---------------------------------------------------------------------------
+# Prepare analysis dataset:
+#   - Convert Age to numeric; participants with birth-year entries become NA
+#   - Exclude the ID column from the summary
+# ---------------------------------------------------------------------------
+d_analysis        <- d
+d_analysis$Age    <- suppressWarnings(as.numeric(d$Age))
+
+# Build formula: Group ~ Age + Sex + all hearing threshold columns
+rhs    <- paste(c("Age", "Sex", l_cols, r_cols), collapse = " + ")
+f      <- as.formula(paste("Group ~", rhs))
+
+# Arsenal tableby — continuous vars: median (Q1, Q3); cat vars: count (%)
+tab <- tableby(
+  formula  = f,
+  data     = d_analysis,
+  numeric.stats = c("medianrange", "Nmiss"),
+  cat.stats     = "countpct",
+  test          = FALSE
+)
+
+summary(tab, digits = 1)
+```
+
+
+## Data quality issues
+
+Two types of data quality issues can be identified in the table above:
+
+1. Birth year recorded instead of age (age maximum is > 150 years for two participants).
+2. Missing right-ear data for one subject.
+
+```{r birthyear-table}
+# Identify rows where Age cannot be coerced to a plausible age in years.
+# A 4-digit birth year (>= 1900) is the expected error pattern.
+age_numeric <- suppressWarnings(as.numeric(d$Age))
+birthyear_ids <- d$ID[!is.na(age_numeric) & age_numeric >= 1900]
+
+kable(
+  data.frame(
+    ID          = birthyear_ids,
+    Age_as_entered = d$Age[d$ID %in% birthyear_ids]
+  ),
+  col.names = c("Subject ID", "Value entered in Age column"),
+  caption   = "Participants with birth year recorded instead of age"
+)
+```
+
+```{r missing-ear-table}
+# Identify participants where every right-ear threshold is NA
+all_r_missing <- apply(d[, r_cols], 1, function(x) all(is.na(x)))
+missing_ids   <- d$ID[all_r_missing]
+
+# For each affected participant, detect which columns are actually NA
+missing_col_strings <- sapply(which(all_r_missing), function(row) {
+  paste(names(d)[is.na(d[row, ])], collapse = ", ")
+})
+
+kable(
+  data.frame(
+    ID              = missing_ids,
+    Missing_columns = missing_col_strings
+  ),
+  col.names = c("Subject ID", "Missing columns"),
+  caption   = "Participants with complete right-ear data missing"
+)
+```
+
+---
