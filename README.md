@@ -5,6 +5,23 @@ This is a good example of a well organized repo for the course [Open Science in 
 
 ## Dependencies
 
+### Software
+- [R](https://cran.r-project.org/) (developed on 4.3.x)
+- [Quarto](https://quarto.org/) (for rendering `.qmd` reports)
+
+### R packages
+- `arsenal` — descriptive statistics tables
+- `ggplot2` — plotting
+- `tidyverse` — data manipulation
+- `ggpubr` — arranging multi-panel figures
+- `svglite` — SVG figure export
+- `quarto` — rendering Quarto documents from R
+
+Install all packages at once:
+```r
+install.packages(c("arsenal", "ggplot2", "tidyverse", "ggpubr", "svglite", "quarto"))
+```
+
 ## Flowchart
 
 ## Scripts (in scripts/)
