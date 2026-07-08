@@ -36,6 +36,8 @@ Individual steps can also be run separately from the repo root (see Scripts sect
 
 ## Flowchart
 
+<img height="700" alt="Untitled Diagram(1)" src="https://github.com/user-attachments/assets/94f9b59a-323b-4080-bd05-cf5f2fd53f60" />
+
 ## Scripts
 
 ### `run_pipeline.R` (repo root)
