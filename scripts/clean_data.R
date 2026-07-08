@@ -51,7 +51,16 @@ clean$Sex <- factor(
 )
 
 # =============================================================================
-# 5. QUICK VALIDATION
+# 5. CALCULATE PURE-TONE AVERAGE (PTA4)
+#    PTA4 is the mean hearing threshold across 500, 1000, 2000, and 4000 Hz.
+#    Calculated separately for left (PTA4L) and right (PTA4R) ears.
+# =============================================================================
+
+clean$PTA4L <- rowMeans(clean[, c("L500", "L1000", "L2000", "L4000")], na.rm = TRUE)
+clean$PTA4R <- rowMeans(clean[, c("R500", "R1000", "R2000", "R4000")], na.rm = TRUE)
+
+# =============================================================================
+# 6. QUICK VALIDATION
 # =============================================================================
 
 cat("--- Cleaned dataset ---\n")
@@ -67,8 +76,13 @@ print(table(clean$Group))
 cat("\nSex distribution:\n")
 print(table(clean$Sex))
 
+cat("\nPTA4L summary (mean of L500, L1000, L2000, L4000):\n")
+print(summary(clean$PTA4L))
+cat("\nPTA4R summary (mean of R500, R1000, R2000, R4000):\n")
+print(summary(clean$PTA4R))
+
 # =============================================================================
-# 6. SAVE CLEANED DATA FRAME
+# 7. SAVE CLEANED DATA FRAME
 # =============================================================================
 
 saveRDS(clean, file = file.path("data", "clean_data.rds"))
