@@ -64,7 +64,7 @@ f      <- as.formula(paste("Group ~", rhs))
 tab <- tableby(
   formula  = f,
   data     = d_analysis,
-  numeric.stats = c("medianrange", "Nmiss"),
+  numeric.stats = c("median", "range", "Nmiss"),
   cat.stats     = "countpct",
   test          = FALSE
 )
