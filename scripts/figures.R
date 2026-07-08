@@ -147,7 +147,7 @@ dev.off()
 
 # SVG
 ggsave(file = "output/audiogram.svg", plot = final_plot,
-       units = "cm", width = 30, height = 14)
+       units = "cm", width = 25, height = 14)
 
 cat("Figures saved to output/audiogram.png and output/audiogram.svg\n")
 
@@ -162,8 +162,8 @@ box <- ggplot(dat_filtered, aes(x = Group, y = Age, fill = Sex)) +
 
 # Save sex within tinnitus group plot as png and svg
 ggsave(file = "output/age_by_group_sex.png", plot = box,
-       units = "cm", width = 12, height = 8)
+       units = "cm", width = 20, height = 14)
 ggsave(file = "output/age_by_group_sex.svg", plot = box,
-       units = "cm", width = 12, height = 8)
+       units = "cm", width = 20, height = 14)
 
 cat("Figures saved to output/audiogram.png, output/audiogram.svg, output/age_by_group_sex.png, and output/age_by_group_sex.svg\n")
