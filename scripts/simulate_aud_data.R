@@ -207,22 +207,22 @@ R_thresholds <- simulate_ear(group, age, sex, N)
 # =============================================================================
 # 9. SIMULATE UCL THRESHOLDS
 #
-#    UCL values in the original data range roughly 75-95 dB SPL.
+#    UCL values in the original data range roughly 75-95 dB HL.
 #    UCLs tend to be inversely related to tinnitus severity (loudness
 #    discomfort is lower / more sensitive in tinnitus patients).
 #
 #    Mean UCL by group:
-#      Group 1: ~87 dB SPL
-#      Group 2: ~85 dB SPL
-#      Group 3: ~84 dB SPL
+#      Group 1: ~87 dB HL
+#      Group 2: ~85 dB HL
+#      Group 3: ~84 dB HL
 #
 #    Age and sex have small effects on UCL; we keep it simple with noise only.
 # =============================================================================
 
-ucl_means_by_group <- c(87, 85, 84)   # mean UCL (dB SPL) for groups 1,2,3
+ucl_means_by_group <- c(87, 85, 84)   # mean UCL (dB HL) for groups 1,2,3
 ucl_sd <- 5                            # within-group SD for UCL
 
-# Returns an integer matrix (UCL values are whole-number dB SPL).
+# Returns an integer matrix (UCL values are whole-number dB HL).
 simulate_ucl <- function(group_vec, n_subj, n_ucl_freqs = 4) {
   mat <- matrix(NA_integer_, nrow = n_subj, ncol = n_ucl_freqs)
   for (i in seq_len(n_subj)) {
@@ -269,33 +269,35 @@ names(sim_data)[(5 + 2*length(freqs)):(5 + 2*length(freqs) + 3)]   <- UCLL_names
 names(sim_data)[(5 + 2*length(freqs) + 4):(5 + 2*length(freqs) + 7)] <- UCLR_names
 
 # =============================================================================
-# 11. QUICK VALIDATION — printed to console, not saved
+# 11. INTRODUCE REALISTIC DATA QUALITY ISSUES
 #
-#     Check that the key relationships are present in the simulated data.
+#     To simulate real-world data entry errors and missing data:
+#
+#     a) BIRTHYEAR INSTEAD OF AGE: Two participants have their birth year
+#        recorded in the Age column instead of their age in years. This
+#        mimics a common data-entry mistake when age is collected on paper
+#        forms. The Age column is converted to character to allow mixed
+#        values (integers and 4-digit years).
+#
+#     b) MISSING EAR DATA: All right-ear hearing threshold columns are set
+#        to NA for one participant, simulating a case where one ear could
+#        not be tested (e.g., due to equipment failure or non-compliance).
+#        UCL values for that ear are also set to NA for consistency.
 # =============================================================================
 
-cat("\n--- Simulated data: sample counts ---\n")
-cat("Total subjects:", N, "\n")
-cat("Group distribution:\n")
-print(table(sim_data$Group))
-cat("\nSex distribution:\n")
-print(table(sim_data$Sex))
-cat("\nAge summary:\n")
-print(summary(sim_data$Age))
+# a) Replace Age with birth year for participants 7 and 43.
+#    A plausible birth year is derived from the current year minus their age,
+#    giving a realistic 4-digit year rather than a random number.
+#    The column must be character to hold both integers and year strings.
 
-cat("\n--- Mean 4000 Hz threshold by group (should increase group 1 < 2 < 3) ---\n")
-cat("Left ear (L4000):\n")
-print(tapply(sim_data$L4000, sim_data$Group, mean))
+sim_data$Age <- as.character(sim_data$Age)
+sim_data$Age[7]  <- as.character(2026L - age[7])   # e.g. age 34 -> "1992"
+sim_data$Age[43] <- as.character(2026L - age[43])  # e.g. age 51 -> "1975"
 
-cat("\n--- Correlation: Age vs. L8000 (should be positive) ---\n")
-cat(round(cor(sim_data$Age, sim_data$L8000), 3), "\n")
-
-cat("\n--- Mean L4000 by sex (1=male should be highest) ---\n")
-print(tapply(sim_data$L4000, sim_data$Sex, mean))
-
-cat("\n--- Linear model: L8000 ~ Age + Sex + Group ---\n")
-lm_check <- lm(L8000 ~ Age + Sex + Group, data = sim_data)
-print(summary(lm_check)$coefficients)
+# b) Set all right-ear thresholds and right-ear UCL to NA for participant 22.
+#    This represents a complete failure to obtain right-ear measurements.
+sim_data[22, R_names]   <- NA
+sim_data[22, UCLR_names] <- NA
 
 # =============================================================================
 # 12. SAVE SIMULATED DATA
@@ -310,111 +312,3 @@ if (!dir.exists(dirname(out_path))) {
 
 write.csv(sim_data, file = out_path, row.names = FALSE)
 cat("\nSimulated data saved to:", out_path, "\n")
-
-# =============================================================================
-# 13. WRITE CODE KEY (data/code_key.xlsx)
-#
-#     Documents every variable in the dataset: name, type, labels/coding,
-#     and unit. Uses the openxlsx package.
-# =============================================================================
-
-library(openxlsx)
-
-# Build the code key as a data frame. One row per variable.
-# Hearing threshold columns: L125 … R8000 (18 columns)
-# UCL columns: UCLL500 … UCLR4000 (8 columns)
-
-# Helper to build rows for a block of similarly-structured columns
-hearing_rows <- function(side, freqs_hz) {
-  data.frame(
-    Variable_name = paste0(side, freqs_hz),
-    Variable_type = "integer",
-    Labels        = paste0(
-      "Pure-tone hearing threshold at ", freqs_hz, " Hz, ",
-      ifelse(side == "L", "left", "right"), " ear"
-    ),
-    Units         = "dB HL",
-    stringsAsFactors = FALSE
-  )
-}
-
-ucl_rows <- function(side, freqs_hz) {
-  data.frame(
-    Variable_name = paste0("UCL", side, freqs_hz),
-    Variable_type = "integer",
-    Labels        = paste0(
-      "Uncomfortable loudness level at ", freqs_hz, " Hz, ",
-      ifelse(side == "L", "left", "right"), " ear"
-    ),
-    Units         = "dB SPL",
-    stringsAsFactors = FALSE
-  )
-}
-
-code_key <- rbind(
-  data.frame(
-    Variable_name = "ID",
-    Variable_type = "integer",
-    Labels        = "Unique subject identifier",
-    Units         = "—",
-    stringsAsFactors = FALSE
-  ),
-  data.frame(
-    Variable_name = "Group",
-    Variable_type = "integer",
-    Labels        = "Tinnitus severity group: 1 = no tinnitus, 2 = mild tinnitus, 3 = severe tinnitus",
-    Units         = "—",
-    stringsAsFactors = FALSE
-  ),
-  data.frame(
-    Variable_name = "Age",
-    Variable_type = "integer",
-    Labels        = "Age of participant",
-    Units         = "years",
-    stringsAsFactors = FALSE
-  ),
-  data.frame(
-    Variable_name = "Sex",
-    Variable_type = "integer",
-    Labels        = "Biological sex / gender identity: 1 = male, 2 = female, 3 = other",
-    Units         = "—",
-    stringsAsFactors = FALSE
-  ),
-  hearing_rows("L", freqs),
-  hearing_rows("R", freqs),
-  ucl_rows("L", ucl_freqs),
-  ucl_rows("R", ucl_freqs)
-)
-
-# Resolve output path (same logic as for the CSV)
-key_path <- file.path("..", "data", "code_key.xlsx")
-if (!dir.exists(dirname(key_path))) {
-  key_path <- file.path("data", "code_key.xlsx")
-}
-
-# Create workbook, style the header row, write data, auto-size columns
-wb <- createWorkbook()
-addWorksheet(wb, "Code Key")
-
-# Header style: bold, light blue fill
-header_style <- createStyle(
-  fontName   = "Calibri",
-  fontSize   = 11,
-  textDecoration = "bold",
-  fgFill     = "#D9E1F2",
-  border     = "Bottom",
-  halign     = "left"
-)
-
-writeData(wb, sheet = "Code Key", x = code_key, headerStyle = header_style)
-
-# Apply a thin border to all data cells for readability
-data_style <- createStyle(border = "TopBottomLeftRight", borderColour = "#BFBFBF")
-addStyle(wb, sheet = "Code Key", style = data_style,
-         rows = 2:(nrow(code_key) + 1), cols = 1:4, gridExpand = TRUE)
-
-# Auto-size columns
-setColWidths(wb, sheet = "Code Key", cols = 1:4, widths = "auto")
-
-saveWorkbook(wb, file = key_path, overwrite = TRUE)
-cat("Code key saved to:", key_path, "\n")
