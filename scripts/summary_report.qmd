@@ -1,0 +1,81 @@
+---
+title: "Audiological Data — Summary Report"
+date: today
+format:
+  html:
+    page-layout: full
+    max-width: 1600px
+    self-contained: true
+    output-file: summary_report.html
+execute:
+  echo: false
+  warning: false
+  message: false
+---
+
+```{r setup}
+library(arsenal)
+library(ggplot2)
+library(tidyverse)
+
+# ---------------------------------------------------------------------------
+# Load cleaned data
+# ---------------------------------------------------------------------------
+data_path <- file.path("..", "data", "clean_data.rds")
+if (!file.exists(data_path)) data_path <- file.path("data", "clean_data.rds")
+
+clean_data <- readRDS(data_path)
+
+# Drop unused "Other" level for plots that compare Male vs Female only
+dat_filtered <- droplevels(clean_data[clean_data$Sex != "Other", ])
+
+# Helper: standard error of mean
+std_error <- function(x) sd(x, na.rm = TRUE) / sqrt(sum(!is.na(x)))
+```
+
+## Descriptive statistics by tinnitus group
+
+```{r arsenal-table, results = "asis"}
+tab <- tableby(
+  Group ~ Age + Sex + PTA4L + PTA4R,
+  data          = clean_data,
+  numeric.stats = c("mean","sd","range", "Nmiss"),
+  cat.stats     = "countpct",
+  test          = FALSE
+)
+
+# Wrap in a div so the width CSS below applies cleanly
+cat('<div class="arsenal-wrapper">\n')
+summary(tab,
+        title  = "Descriptive statistics by tinnitus severity group",
+        digits = 1)
+cat('</div>\n')
+```
+
+```{=html}
+<style>
+  /* Adjust the percentage below to resize the descriptive-statistics table */
+  .arsenal-wrapper {
+    width: 75%;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .arsenal-wrapper table {
+    width: 100% !important;
+  }
+</style>
+```
+
+---
+
+## Age distribution by group and sex
+
+::: {style="text-align: center;"}
+![](../output/age_by_group_sex.svg)
+:::
+
+## Audiogram with UCL by tinnitus group
+
+::: {style="text-align: center;"}
+![](../output/audiogram.svg)
+:::
