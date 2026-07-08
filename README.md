@@ -22,9 +22,34 @@ Install all packages at once:
 install.packages(c("arsenal", "ggplot2", "tidyverse", "ggpubr", "svglite", "quarto"))
 ```
 
+## Usage
+
+To run the full pipeline from start to finish, execute the following from the repo root:
+
+```r
+Rscript run_pipeline.R
+```
+
+This runs all steps in order, checks that required packages are installed, and stops with an informative error if any step fails.
+
+Individual steps can also be run separately from the repo root (see Scripts section below).
+
 ## Flowchart
 
-## Scripts (in scripts/)
+## Scripts
+
+### `run_pipeline.R` (repo root)
+
+Master script that runs the full pipeline in the correct order:
+
+1. `scripts/simulate_aud_data.R` — simulate raw data
+2. `scripts/render_report.R` — render the data quality report
+3. `scripts/clean_data.R` — clean and validate the data
+4. `scripts/figures.R` — generate output figures
+5. `scripts/render_summary.R` — render the summary report
+
+Pre-flight checks verify that all required R packages are installed and that the `data/` and `output/` directories exist before any step runs.
+
 
 ### `simulate_aud_data.R`
 Generates a simulated audiological dataset of 150 subjects (`data/aud_data_simulated.csv`) with plausible real-world relationships between tinnitus severity, hearing thresholds, age, and sex.
