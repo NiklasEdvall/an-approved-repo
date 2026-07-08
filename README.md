@@ -1,7 +1,10 @@
 # an-approved-repo
-This is a good example of a well organized repo for the course [Open Science in Practice: Collaborative Research with Git](https://doctoralcourses.application.ki.se/fubasextern/info?kurs=K8F6106).
+This is an example of an organized repo for the course [Open Science in Practice: Collaborative Research with Git](https://doctoralcourses.application.ki.se/fubasextern/info?kurs=K8F6106).
 
 ## Purpose
+- Create a simulated dataset of 150 patients with either no, mild or severe tinnitus, some basic demographics and results from a hearing test (pure tone audiometry + UCL).
+- Clean up, visualize and summarize the simulated data in an organized and well described pipeline.
+- Use quarto markdown template to generate a summary report as html
 
 ## Dependencies
 
