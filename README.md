@@ -7,7 +7,7 @@ This is a good example of a well organized repo for the course [Open Science in 
 
 ## Scripts (in scripts/)
 
-### `ssimulate_aud_data.R`
+### `simulate_aud_data.R`
 Generates a simulated audiological dataset of 150 subjects (`data/aud_data_simulated.csv`) with plausible real-world relationships between tinnitus severity, hearing thresholds, age, and sex.
 
 Key features of the simulated data:
