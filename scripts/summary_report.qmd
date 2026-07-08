@@ -33,7 +33,17 @@ dat_filtered <- droplevels(clean_data[clean_data$Sex != "Other", ])
 std_error <- function(x) sd(x, na.rm = TRUE) / sqrt(sum(!is.na(x)))
 ```
 
+This project investigate the relationship between tinnitus severity and audiological measures. The following report summarizes the descriptive statistics of the study sample, including sex and age. Data was simulated to illustrate the analysis workflow and is not based on real participants.
+
+One subject was excluded because of missing audiological data. Two subjects had age reported as their birthyear, which was corrected to their actual age at data collecttion. The final sample size is 149 participants.
+
 ## Descriptive statistics by tinnitus group
+Mean and standard deviation (SD) are reported for continuous variables, while counts and percentages are reported for categorical variables.
+
+Two noteworthy observations:
+
+- Men are over-represented in the severe tinnitus group (74.4%)
+- Hearing thresholds are around 10 dB higher in the severe tinnitus group compared to the group with no tinnitus.
 
 ```{r arsenal-table, results = "asis"}
 tab <- tableby(
@@ -70,11 +80,15 @@ cat('</div>\n')
 
 ## Age distribution by group and sex
 
+The boxplot below displays the age distribution by tinnitus severity group, for men and women separately. Sex reported as "Other" was only reported by four subjects and is excluded from this plot due to too few observations for meaningful interpretation. The median age is similar across groups.
+
 ::: {style="text-align: center;"}
 ![](../output/age_by_group_sex.svg)
 :::
 
 ## Audiogram with UCL by tinnitus group
+
+Pure tone audiometry at standard clinical frequencies (0.25–8 kHz) was performed. The audiogram below displays the mean hearing thresholds and their standard deviations for the left and right ears, along with the upper comfort level (UCL) for each tinnitus severity group. The UCL is the maximum sound level that a person can tolerate without discomfort. Notably, increasing tinnitus severity is associated with higher hearing thresholds at frequencies above 2 kHz. UCL seem unaffected by tinnitus severity.
 
 ::: {style="text-align: center;"}
 ![](../output/audiogram.svg)
