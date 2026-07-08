@@ -5,6 +5,8 @@ This is a good example of a well organized repo for the course [Open Science in 
 
 ## Dependencies
 
+## Flowchart
+
 ## Scripts (in scripts/)
 
 ### `simulate_aud_data.R`
@@ -17,11 +19,11 @@ Key features of the simulated data:
 
 ### `data_quality_report.qmd`
 
-Quarto report that reads the raw simulated data and produces `data/data_quality_report.html`. Contains a descriptive table (stratified by tinnitus group) and a data quality section that automatically identifies and lists subjects with birth year entered instead of age, and subjects with missing ear data.
+Quarto report that reads the raw simulated data and produces `output/data_quality_report.html`. Contains a descriptive table (stratified by tinnitus group) and a data quality section that automatically identifies and lists subjects with birth year entered instead of age, and subjects with missing ear data.
 
 ### `render_report.R`
 
-Helper script to render `data_quality_report.qmd` and save the output to `data/`. Run from the repo root with `Rscript scripts/render_report.R`.
+Helper script to render `data_quality_report.qmd` and save the output to `output/`. Run from the repo root with `Rscript scripts/render_report.R`.
 
 ### `clean_data.R`
 Reads the raw data and 
@@ -29,4 +31,16 @@ Reads the raw data and
 - Convert categorical variables to labelled factors
 - Saves the result as `data/clean_data.rds`. Run from the repo root with `Rscript scripts/clean_data.R`.
 
-## Flowchart
+### `figures.R`
+Generates visualizations of the cleaned data, including descriptive table, audiograms and age distribution plots by tinnitus group and sex. Creates both PNG and SVG output files in the `output/` directory.
+
+### `summary_report.qmd`
+
+Quarto report that reads `data/clean_data.rds` and produces `output/summary_report.html`. Contains a descriptive table (`Group ~ Age + Sex + PTA4L + PTA4R`), a boxplot of age distribution by group and sex, and the grouped audiogram with UCL.
+
+### `render_summary.R`
+
+Helper script to render `summary_report.qmd` and save the output to `output/`. Run from the repo root with `Rscript scripts/render_summary.R`.
+
+
+
