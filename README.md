@@ -1,5 +1,5 @@
 # an-approved-repo
-This is an example of an organized repo for the course [Open Science in Practice: Collaborative Research with Git](https://doctoralcourses.application.ki.se/fubasextern/info?kurs=K8F6106).
+This is an example of an organized repo for the course [Open Science in Practice: Collaborative Research with Git](https://k-cir.github.io/course-open-science-in-practice/).
 
 ## Purpose
 - Create a simulated dataset of 150 patients with either no, mild or severe tinnitus, some basic demographics and results from a hearing test (pure tone audiometry + UCL).
